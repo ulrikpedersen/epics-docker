@@ -1,0 +1,17 @@
+FROM epics-base
+
+# ASYN requirements:
+RUN dnf -y --enablerepo=PowerTools install rpcgen libtirpc-devel
+# SEQ requirements:
+RUN dnf -y install re2c
+
+
+USER ${USERNAME}
+
+WORKDIR /src
+
+RUN curl -L  -s -o asyn-R4-39.tar.gz -O https://github.com/epics-modules/asyn/archive/R4-39.tar.gz &&\
+    tar -zxf asyn-R4-39.tar.gz &&\
+    echo "EPICS_BASE="$EPICS_BASE > /src/asyn-R4-39/configure/RELEASE &&\
+    ln -s /src/asyn-R4-39/ /epics/asyn
+    # make -sj -C /epics/asyn/ >> /src/asynbuild.log 2>&1 
