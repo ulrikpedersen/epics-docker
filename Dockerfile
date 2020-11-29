@@ -26,14 +26,17 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} &&\
 USER ${USERNAME}
 
 # Get sources either from download or tars dir
-#RUN curl -L -O https://epics.anl.gov/download/base/base-7.0.3.1.tar.gz &&\
+#RUN curl -L -O https://epics.anl.gov/download/base/base-7.0.4.1.tar.gz &&\
 COPY tars/* .
-
-RUN cd /src/ &&\
-        tar -zxf base*.tar.gz &&\
-        ln -s /src/base-7.0.3.1/ ${EPICS_BASE} &&\
-        echo "Starting build" &&\
-        make -sj -C ${EPICS_BASE} >> /src/epicsbasebuild.log 2>&1 
+RUN ls -alh /src/
+RUN cd /src/ && tar -zxf base*.tar.gz
+RUN ln -s /src/base-R7.0.4.1/ ${EPICS_BASE}
+RUN ls -alh /src
+RUN ls -alh /src/base*
+RUN ls -alh /epics/base
+RUN env
+RUN echo "Starting build" &&\
+        make -j -C ${EPICS_BASE} 2>&1 | tee /src/epicsbasebuild_$(date --rfc-3339 date).log 
     #dnf -y clean all && rm -rf /var/cache/yum &&\
     #cd / # && rm -rf /src/build* /src/*.tar*
 
