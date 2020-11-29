@@ -1,0 +1,35 @@
+# EPICS Base Dockerfile
+
+FROM epics:latest 
+ARG USERNAME=epicsuser
+
+# Set the working directory to /src
+WORKDIR /src
+
+#ENV EPICS_BASE=/epics/base
+ENV EPICS_EXTENSIONS=/epics/extensions
+#ENV EPICS_HOST_ARCH=linux-x86_64
+#ENV PATH="${EPICS_EXTENSION}/bin/${EPICS_HOST_ARCH}:${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${PATH}"
+ENV PATH="${EPICS_EXTENSION}/bin/${EPICS_HOST_ARCH}:${PATH}"
+
+USER root
+#RUN yum -y update && yum -y clean all &&\
+RUN dnf -y --enablerepo=PowerTools install git giflib-devel zlib-devel libpng-devel giflib motif-devel libXtst-devel
+
+USER ${USERNAME}
+
+COPY data/extensions-edm.patch /src
+RUN curl --output edm.tar.gz -L https://github.com/gnartohl/edm/archive/Version-1-12-105H.tar.gz
+RUN cd /epics && git clone https://github.com/epics-extensions/extensions.git
+RUN cd "${EPICS_EXTENSIONS}/src" && tar -zxf /src/edm.tar.gz && ln -s edm-* edm
+RUN cd "${EPICS_EXTENSIONS}" && git apply /src/extensions-edm.patch
+# TODO: fix this hack: patching an internal edm Makefile to remove use of lib ungif
+RUN cd "${EPICS_EXTENSIONS}/src/edm/giflib" && sed -e 's/\<ungif\>//g' Makefile > Makefile
+
+RUN cd ${EPICS_EXTENSIONS} && echo "Starting build" &&\
+        make 2>&1 | tee /src/edm_build_$(date --rfc-3339 date).log 
+    #dnf -y clean all && rm -rf /var/cache/yum &&\
+    #cd / # && rm -rf /src/build* /src/*.tar*
+
+
+

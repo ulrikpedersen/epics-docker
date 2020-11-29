@@ -1,0 +1,20 @@
+diff --git a/src/Makefile b/src/Makefile
+index 70b248c..d0673b6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -45,6 +45,7 @@ JPROBE = jprobe
+ KM = km
+ NOBCONFIG = knobconfig
+ MEDM = medm
++EDM = edm
+ MOTIFBUTTON = motifButton
+ EXTENSION_MSI = msi
+ NAMECAPTURE = namecapture
+@@ -96,6 +97,7 @@ DIRS += $(JDCT)
+ DIRS += $(JPROBE)
+ DIRS += $(KM)
+ DIRS += $(MEDM)
++DIRS += $(EDM)
+ DIRS += $(MOTIFBUTTON)
+ DIRS += $(EXTENSION_MSI)
+ DIRS += $(NAMECAPTURE)
